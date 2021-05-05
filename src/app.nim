@@ -1,8 +1,17 @@
 import prologue
+import prologue/middlewares
 
-proc hello*(ctx: Context) {.async.} =
-  resp "<h1>Hello, Prologue!</h1>"
+# Async Function
+proc home*(ctx: Context) {.async.} =
+  resp "<h1>Home</h1>"
 
-let app = newApp()
-app.addRoute("/", hello)
+proc helloName*(ctx: Context) {.async.} =
+  resp "<h1>Hello, " & ctx.getPathParams("name", "Prologue") & "</h1>"
+
+let settings = newSettings(appName = "Prologue")
+var app = newApp(settings = settings)
+app.use(debugRequestMiddleware())
+app.addRoute("/", home, HttpGet)
+app.addRoute("/home", home, HttpGet)
+app.addRoute("/hello/{name}", helloName, HttpGet)
 app.run()
